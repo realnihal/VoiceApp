@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 
 void test() async {
+  AudioPlayer player = AudioPlayer();
   const gender = 'male';
   const lang = 'Hindi';
   const text = 'चॉकलेट आइसक्रीम बनाने की विधि बताओ';
@@ -20,7 +24,12 @@ void test() async {
   final response = await http.post(url, headers: headers, body: payload);
 
   final audio = jsonDecode(response.body)['audio'];
-  print(audio);
+  Uint8List decoded = base64.decode(audio);
+  print(decoded);
+
+  // await audioPlayer.play(BytesSource(decoded));
+  // Comment this out to listen to tts.wav
+  await player.play(BytesSource(decoded));
 
   print('done');
 }
