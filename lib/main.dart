@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:voice_app/features/auth/register.dart';
 
 import 'features/auth/loginScreen.dart';
+import 'features/home/recorder.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/': (context) => const LoginScreen(),
             '/register': (context) => const RegisterPage(),
+            '/recorder': (context) => const SimpleRecorder(),
           },
         );
       },

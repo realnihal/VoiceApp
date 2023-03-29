@@ -1,8 +1,14 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_app/api/bank.dart';
-
+import 'dart:convert';
 import '../auth/loginScreen.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   String username;
@@ -13,6 +19,78 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  FlutterSoundRecorder recorder = FlutterSoundRecorder();
+  final String _mPath = 'tau_file.mp4';
+  String _path = "";
+  File audiofile = File('tau_file.mp4');
+
+  Future stop() async {
+    await recorder.stopRecorder();
+    await _writeFileToStorage();
+    await asr();
+  }
+
+  Future<void> _writeFileToStorage() async {
+    audiofile = File('$_path/$_mPath');
+    Uint8List bytes = await audiofile.readAsBytes();
+    audiofile.writeAsBytes(bytes);
+  }
+
+  Future record() async {
+    await recorder.startRecorder(toFile: _mPath, codec: Codec.aacMP4);
+  }
+
+  Future<void> asr() async {
+    var inputLanguage = 'hindi'; // input audio language
+    var inputAudioPath = audiofile.path; // input audio path
+    var url = Uri.parse('https://asr.iitm.ac.in/asr/v2/decode'); // endpoint
+
+    // Extracting the audio file name
+    var audioFile = inputAudioPath.split('/').reversed.first;
+
+    // JSON payload
+    var payload = {'vtt': 'true', 'language': inputLanguage};
+
+    // Audio file in binary format
+    var request = http.MultipartRequest('POST', url)
+      ..headers['content-type'] = 'multipart/form-data'
+      ..fields.addAll(payload)
+      ..files.add(await http.MultipartFile.fromPath('file', inputAudioPath));
+    var response = await request.send();
+    var responseBody = await response.stream.bytesToString();
+
+    // Get the transcript only
+    var text = json.decode(responseBody);
+    var stt = text['transcript'];
+
+    print(responseBody); // Complete response
+    print(stt); // Transcript only
+  }
+
+  void initRecorder() async {
+    Directory tempDir = await getTemporaryDirectory();
+    _path = tempDir.path;
+    final status = await Permission.microphone.request();
+
+    if (status != PermissionStatus.granted) {
+      print('Microphone permission not granted');
+    }
+
+    await recorder.openRecorder();
+  }
+
+  @override
+  void initState() {
+    initRecorder();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    recorder.closeRecorder();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +162,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
+          ElevatedButton(
+            onPressed: () async {
+              if (recorder.isRecording) {
+                await stop();
+              } else {
+                await record();
+              }
+              setState(() {});
+            },
+            child: Icon(
+              (recorder.isRecording) ? Icons.stop : Icons.mic,
+              size: 80,
+            ),
+          )
         ],
       ),
     );
