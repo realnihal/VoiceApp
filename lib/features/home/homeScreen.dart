@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -20,28 +18,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
-  final String _mPath = 'tau_file.mp4';
-  String _path = "";
-  File audiofile = File('tau_file.mp4');
+  final String _mPath = 'tau_file';
+  File audiofile = File('tau_file');
 
   Future stop() async {
-    await recorder.stopRecorder();
-    await _writeFileToStorage();
+    final path = await recorder.stopRecorder();
+    audiofile = File(path!);
+    print(audiofile.path);
     await asr();
   }
 
-  Future<void> _writeFileToStorage() async {
-    audiofile = File('$_path/$_mPath');
-    Uint8List bytes = await audiofile.readAsBytes();
-    audiofile.writeAsBytes(bytes);
-  }
-
   Future record() async {
-    await recorder.startRecorder(toFile: _mPath, codec: Codec.aacMP4);
+    await recorder.startRecorder(toFile: _mPath);
   }
 
   Future<void> asr() async {
-    var inputLanguage = 'hindi'; // input audio language
+    var inputLanguage = 'english'; // input audio language
     var inputAudioPath = audiofile.path; // input audio path
     var url = Uri.parse('https://asr.iitm.ac.in/asr/v2/decode'); // endpoint
 
@@ -68,8 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void initRecorder() async {
-    Directory tempDir = await getTemporaryDirectory();
-    _path = tempDir.path;
     final status = await Permission.microphone.request();
 
     if (status != PermissionStatus.granted) {
