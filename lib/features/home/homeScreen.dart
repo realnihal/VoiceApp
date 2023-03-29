@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:voice_app/api/tts.dart';
+import 'package:voice_app/api/bank.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+import '../auth/loginScreen.dart';
 
+class HomeScreen extends StatefulWidget {
+  String username;
+  HomeScreen({super.key, required this.username});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  '\$ 1,000',
+                  "",
                   style: TextStyle(
                     fontSize: 40,
                     color: Colors.black,
@@ -41,7 +49,8 @@ class HomeScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   print('tapped');
-                  test();
+                  RPBankAPI api = RPBankAPI();
+                  api.checkBalance(username: widget.username);
                 },
                 child: speakOutBalance(),
               ),
@@ -74,11 +83,13 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
+
+  void getTextfromAudio() {}
 
   Container speakOutBalance() {
     return Container(
@@ -113,9 +124,9 @@ class HomeScreen extends StatelessWidget {
   AppBar homeScreenAppBar() {
     return AppBar(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Padding(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Padding(
             padding: EdgeInsets.all(2.0),
             child: Image(
               image: AssetImage("assets/images/logo.png"),
@@ -123,7 +134,42 @@ class HomeScreen extends StatelessWidget {
               width: 30,
             ),
           ),
-          Text('EasyBank', style: TextStyle(color: Colors.black)),
+          const Text('EasyBank', style: TextStyle(color: Colors.black)),
+          PopupMenuButton(
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.black,
+              ),
+              // icon: Icon(Icons.book)
+              itemBuilder: (context) {
+                return [
+                  const PopupMenuItem<int>(
+                    value: 0,
+                    child: Text("My Account"),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: Text("Settings"),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: Text("Logout"),
+                  ),
+                ];
+              },
+              onSelected: (value) {
+                if (value == 0) {
+                  print("My account menu is selected.");
+                } else if (value == 1) {
+                  print("Settings menu is selected.");
+                } else if (value == 2) {
+                  print("Logout menu is selected.");
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()));
+                }
+              }),
         ],
       ),
       backgroundColor: Colors.white,

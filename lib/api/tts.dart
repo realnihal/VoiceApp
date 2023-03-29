@@ -1,15 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 
-void test() async {
+void tts({required String text}) async {
   AudioPlayer player = AudioPlayer();
   const gender = 'male';
-  const lang = 'Hindi';
-  const text = 'चॉकलेट आइसक्रीम बनाने की विधि बताओ';
+  const lang = 'English';
 
   final url = Uri.parse('https://asr.iitm.ac.in/ttsv2/tts');
   final payload = jsonEncode(<String, dynamic>{

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:voice_app/features/auth/register.dart';
 
 import 'features/auth/loginScreen.dart';
-import 'features/home/homeScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,12 +27,13 @@ class MyApp extends StatelessWidget {
             colorScheme:
                 ColorScheme.fromSwatch().copyWith(secondary: Colors.black),
             primarySwatch: Colors.blue,
-            textTheme: Typography.englishLike2018.apply(fontSizeFactor: 1.sp),
+            textTheme: Typography.englishLike2018
+                .apply(fontSizeFactor: 1.sp, bodyColor: Colors.black),
           ),
           initialRoute: '/',
           routes: {
             '/': (context) => const LoginScreen(),
-            '/home': (context) => const HomeScreen(),
+            '/register': (context) => const RegisterPage(),
           },
         );
       },
