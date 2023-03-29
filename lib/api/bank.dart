@@ -64,4 +64,44 @@ class RPBankAPI {
     print(response.body);
     tts(text: "${response.body}rupees only");
   }
+
+  void transferMoney({
+    required String username,
+    required String amount,
+    required String from,
+    required String to,
+  }) async {
+    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+
+    // to check balance
+    var payload = json.encode({
+      "action": "transfer",
+      "amount": amount,
+      "from_user": from,
+      "to_user": to
+    });
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var response = await http.post(url, headers: headers, body: payload);
+    print(response.body);
+  }
+
+  void userDetails({required String user}) async {
+    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+
+    // to check balance
+    var payload = json.encode({
+      "action": "history",
+      "nick_name": user,
+    });
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var response = await http.post(url, headers: headers, body: payload);
+    var responseBody = response.body;
+
+    var text = json.decode(responseBody);
+    print(text);
+  }
 }

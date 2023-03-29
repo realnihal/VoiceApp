@@ -4,9 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_app/api/bank.dart';
-import 'dart:convert';
+import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
-import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   String username;
@@ -19,45 +18,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
   final String _mPath = 'audio.mp4';
+  String output = "";
   File audiofile = File('audio.mp4');
-
-  Future stop() async {
-    final path = await recorder.stopRecorder();
-    audiofile = File(path!);
-    print(audiofile.path);
-    await asr();
-  }
-
-  Future record() async {
-    await recorder.startRecorder(toFile: _mPath);
-  }
-
-  Future<void> asr() async {
-    var inputLanguage = 'english'; // input audio language
-    var inputAudioPath = audiofile.path; // input audio path
-    var url = Uri.parse('https://asr.iitm.ac.in/asr/v2/decode'); // endpoint
-
-    // Extracting the audio file name
-    var audioFile = inputAudioPath.split('/').reversed.first;
-
-    // JSON payload
-    var payload = {'vtt': 'true', 'language': inputLanguage};
-
-    // Audio file in binary format
-    var request = http.MultipartRequest('POST', url)
-      ..headers['content-type'] = 'multipart/form-data'
-      ..fields.addAll(payload)
-      ..files.add(await http.MultipartFile.fromPath('file', inputAudioPath));
-    var response = await request.send();
-    var responseBody = await response.stream.bytesToString();
-
-    // Get the transcript only
-    var text = json.decode(responseBody);
-    var stt = text['transcript'];
-
-    print(responseBody); // Complete response
-    print(stt); // Transcript only
-  }
 
   void initRecorder() async {
     final status = await Permission.microphone.request();
@@ -81,31 +43,54 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future record() async {
+    await recorder.startRecorder(toFile: _mPath);
+  }
+
+  Future stop() async {
+    final path = await recorder.stopRecorder();
+    audiofile = File(path!);
+    output = await asr(path: audiofile.path);
+    setState(() {});
+    checkcases(string: output);
+  }
+
+  void checkcases({required string}) {
+    RPBankAPI api = RPBankAPI();
+    if (string.contains('balance')) {
+      api.checkBalance(username: widget.username);
+    }
+    if (string.contains('details')) {
+      api.userDetails(user: widget.username);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: homeScreenAppBar(),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            height: 150,
+            height: 200,
             width: 1.sw,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               // show current balance
-              children: const [
-                SizedBox(height: 20),
+              children: [
                 Text(
-                  'Current Balance',
-                  style: TextStyle(
+                  (recorder.isRecording) ? 'Speak out your query' : '',
+                  style: const TextStyle(
                     fontSize: 20,
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
-                  "",
-                  style: TextStyle(
-                    fontSize: 40,
+                  output,
+                  style: const TextStyle(
+                    fontSize: 18,
                     color: Colors.black,
                   ),
                 ),
@@ -151,6 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
+          ),
+          SizedBox(
+            height: 0.2.sh,
           ),
           ElevatedButton(
             onPressed: () async {
