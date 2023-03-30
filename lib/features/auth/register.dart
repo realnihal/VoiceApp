@@ -134,14 +134,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: 300,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       RPBankAPI api = RPBankAPI();
-                      api.register(
+                      await api.register(
                         mobile: _mobileController.text,
                         pin: _pinController.text,
                         fullname: _fullnameController.text,
                         username: _usernameController.text,
                       );
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

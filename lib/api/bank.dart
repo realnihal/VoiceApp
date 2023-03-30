@@ -36,7 +36,7 @@ class User {
 }
 
 class RPBankAPI {
-  void register({
+  Future<void> register({
     required String fullname,
     required String username,
     required String mobile,

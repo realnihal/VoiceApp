@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (isTelugu) {
       var translation = await translator.translate(string, to: 'en');
       string = translation.text;
-      print(translation.text);
+      print(translation.text.toLowerCase());
     }
     RPBankAPI api = RPBankAPI();
     if (string.contains('balance')) {

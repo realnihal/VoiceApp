@@ -21,6 +21,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _toController = TextEditingController();
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
   final String _mPath = 'audio.mp4';
   File audiofile = File('audio.mp4');
@@ -45,6 +46,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void dispose() {
     recorder.closeRecorder();
+    _amountController.dispose();
+    _toController.dispose();
     super.dispose();
   }
 
@@ -56,9 +59,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() {});
     final path = await recorder.stopRecorder();
     audiofile = File(path!);
-    output = await asr(path: audiofile.path);
+    output = await asrf(path: audiofile.path);
     output = output.substring(0, output.length - 1);
-    setState(() {});
+    setState(() {
+      _toController.text = output;
+    });
     print(output);
     chosenname(output);
   }
@@ -96,7 +101,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   sentMoney() async {
     await tts(
       text:
-          "you have sent amount of ${_amountController.text} rupees to $output. Thank you for using Voice App.",
+          "you have sent amount of ${_amountController.text} rupees to $output. Thank you for using Voice Bank.",
     );
     Navigator.pop(context);
   }
@@ -115,15 +120,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  (output == "")
-                      ? "Press the button to start recording"
-                      : output,
+                  (output == "") ? "Press the button to start recording" : "",
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
+              SizedBox(
+                width: 0.8.sw,
+                child: TextField(
+                  controller: _toController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter the recipient',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               const SizedBox(height: 20),
               SizedBox(
                 width: 0.8.sw,
