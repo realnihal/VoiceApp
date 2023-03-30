@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/api/tts.dart';
+import 'package:voice_app/features/home/profileScreen.dart';
 import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
 import '../payment/Payment.dart';
@@ -69,7 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     if (string.contains('details')) {
-      await api.userDetails(user: widget.username);
+      final User user = await api.userDetails(user: widget.username);
+      await tts(
+          text:
+              "Here are your deatails ${user.fullName}. Your upi id is ${user.upiId}. Your account name is ${user.nickName}. Your account username is ${user.userName}. Your mobile number is ${user.mobNumber}");
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return ProfileScreen(user: user);
+      }));
       return;
     }
     if (string.contains('history')) {

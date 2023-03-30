@@ -128,7 +128,7 @@ class RPBankAPI {
     }
   }
 
-  Future<void> userDetails({required String user}) async {
+  Future<User> userDetails({required String user}) async {
     JsonCodec codec = const JsonCodec();
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
@@ -150,7 +150,8 @@ class RPBankAPI {
     responseBody = "{\"_id\": \"$userId\", ${responseBody.substring(46)}";
     print(responseBody);
     User userNew = User.fromJson(jsonDecode(responseBody));
-    print(userNew);
+    print(userNew.fullName);
+    return userNew;
   }
 
   Future<void> userRemove({required String user}) async {
