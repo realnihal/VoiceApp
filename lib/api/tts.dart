@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 
-void tts({required String text}) async {
+Future<void> tts({required String text}) async {
   AudioPlayer player = AudioPlayer();
   const gender = 'male';
   const lang = 'English';

@@ -65,9 +65,8 @@ class RPBankAPI {
     tts(text: "${response.body}rupees only");
   }
 
-  Future<void> transferMoney({
-    required String username,
-    required String amount,
+  Future<bool> transferMoney({
+    required int amount,
     required String from,
     required String to,
   }) async {
@@ -80,11 +79,20 @@ class RPBankAPI {
       "from_user": from,
       "to_user": to
     });
+    print(payload);
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    print(response.body);
+    var response = await http.post(
+      url,
+      headers: headers,
+      body: payload,
+    );
+    if (response.body.contains("success")) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<void> userDetails({required String user}) async {
@@ -101,8 +109,7 @@ class RPBankAPI {
     var response = await http.post(url, headers: headers, body: payload);
     var responseBody = response.body;
 
-    var text = json.decode(responseBody);
-    print(text);
+    print(responseBody);
   }
 
   Future<void> userRemove({required String user}) async {
