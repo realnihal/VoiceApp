@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
   final String _mPath = 'audio.mp4';
+  String history = '';
   String output = "";
   File audiofile = File('audio.mp4');
 
@@ -55,13 +56,20 @@ class _HomeScreenState extends State<HomeScreen> {
     checkcases(string: output);
   }
 
-  void checkcases({required string}) {
+  void checkcases({required string}) async {
     RPBankAPI api = RPBankAPI();
     if (string.contains('balance')) {
-      api.checkBalance(username: widget.username);
+      await api.checkBalance(username: widget.username);
     }
     if (string.contains('details')) {
-      api.userDetails(user: widget.username);
+      await api.userDetails(user: widget.username);
+    }
+    if (string.contains('history')) {
+      history = await api.userHistory(user: widget.username);
+    }
+    if (string.contains('remove')) {
+      await api.userRemove(user: widget.username);
+      Navigator.pushReplacementNamed(context, "/");
     }
   }
 

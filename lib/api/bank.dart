@@ -49,7 +49,7 @@ class RPBankAPI {
     }
   }
 
-  void checkBalance({required String username}) async {
+  Future<void> checkBalance({required String username}) async {
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
     // to check balance
@@ -65,7 +65,7 @@ class RPBankAPI {
     tts(text: "${response.body}rupees only");
   }
 
-  void transferMoney({
+  Future<void> transferMoney({
     required String username,
     required String amount,
     required String from,
@@ -87,7 +87,43 @@ class RPBankAPI {
     print(response.body);
   }
 
-  void userDetails({required String user}) async {
+  Future<void> userDetails({required String user}) async {
+    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+
+    // to check balance
+    var payload = json.encode({
+      "action": "details",
+      "nick_name": user,
+    });
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var response = await http.post(url, headers: headers, body: payload);
+    var responseBody = response.body;
+
+    var text = json.decode(responseBody);
+    print(text);
+  }
+
+  Future<void> userRemove({required String user}) async {
+    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+
+    // to check balance
+    var payload = json.encode({
+      "action": "remove",
+      "nick_name": user,
+    });
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var response = await http.post(url, headers: headers, body: payload);
+    var responseBody = response.body;
+
+    var text = json.decode(responseBody);
+    print(text);
+  }
+
+  Future<String> userHistory({required String user}) async {
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
     // to check balance
@@ -103,5 +139,6 @@ class RPBankAPI {
 
     var text = json.decode(responseBody);
     print(text);
+    return text;
   }
 }
