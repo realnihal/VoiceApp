@@ -1,26 +1,18 @@
+
 # voice_app
 
-A new Flutter project.
+## Team Details
 
-## Getting Started
+the team is the 2 of us:
+- Nihal Puram (IIT Madras)
+- Yash Renwa (VIT Vellore)
 
-This project is a starting point for a Flutter application.
+our emails are
+ae19b047@smail.iitm.ac.in
+yash.renwa@gmail.com
 
-A few resources to get you started if this is your first Flutter project:
+## App details
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+We have tried to implement this app in **English** and **Telugu**.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# VoiceApp
-
-
-## Setting up backend:
-To run the Backend setup .env file in the backend_fasp_api directory
-```
-SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
+You can read the manual in the app for instructions on how to trigger the individual commands. We have tried our best to complete the hackathon and fulfil the problem statement to the best of our ability. I hope you like our project and will support us.
