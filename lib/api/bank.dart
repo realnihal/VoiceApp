@@ -166,13 +166,15 @@ class RPBankAPI {
     var headers = {'Content-Type': 'application/json'};
 
     var response = await http.post(url, headers: headers, body: payload);
-    var responseBody = response.body;
-
-    var text = json.decode(responseBody);
-    print(text);
+    String responseBody = response.body;
+    if (responseBody.contains("")) {
+      tts(text: "User removed successfully");
+    } else {
+      tts(text: "User not found");
+    }
   }
 
-  Future<String> userHistory({required String user}) async {
+  Future<List> userHistory({required String user}) async {
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
     // to check balance
@@ -185,8 +187,17 @@ class RPBankAPI {
 
     var response = await http.post(url, headers: headers, body: payload);
     var responseBody = response.body;
+    responseBody = responseBody.replaceAll("'", '"');
+    responseBody = responseBody.replaceAll("ObjectId(", "");
+    responseBody = responseBody.replaceAll(")", "");
+
+    List jsonparsed = json.decode(responseBody);
 
     print(responseBody);
-    return responseBody;
+    if (jsonparsed.length < 10) {
+    } else {
+      jsonparsed = jsonparsed.reversed.toList().sublist(0, 10);
+    }
+    return jsonparsed;
   }
 }

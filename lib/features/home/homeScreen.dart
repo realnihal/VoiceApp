@@ -1,11 +1,16 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:translator/translator.dart';
 import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/api/tts.dart';
+import 'package:voice_app/features/auth/languagueScreen.dart';
 import 'package:voice_app/features/home/profileScreen.dart';
 import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
@@ -25,9 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isRecording = false;
   bool isLoading = false;
   final String _mPath = 'audio.mp4';
-  String history = '';
+  List history = [];
   String output = "";
   File audiofile = File('audio.mp4');
+  bool isTelugu = false;
 
   void initRecorder() async {
     final status = await Permission.microphone.request();
@@ -39,8 +45,14 @@ class _HomeScreenState extends State<HomeScreen> {
     await recorder.openRecorder();
   }
 
+  checkPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    isTelugu = (prefs.getString('language') == "telugu");
+  }
+
   @override
   void initState() {
+    checkPrefs();
     initRecorder();
     super.initState();
   }
@@ -64,6 +76,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void checkcases({required string}) async {
+    final translator = GoogleTranslator();
+    print("Is telugu check is here $isTelugu");
+    if (isTelugu) {
+      var translation = await translator.translate(string, to: 'en');
+      string = translation.text;
+      print(translation.text);
+    }
     RPBankAPI api = RPBankAPI();
     if (string.contains('balance')) {
       await api.checkBalance(username: widget.username);
@@ -81,6 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (string.contains('history')) {
       history = await api.userHistory(user: widget.username);
+      setState(() {});
+
+      for (int i = 0; i < history.length; i++) {
+        print(history[i]);
+        await tts(
+            text:
+                "Transaction ${i + 1} ${history[i]['amount']} rupees from ${history[i]['from_user']} to ${history[i]['to_user']}");
+      }
       return;
     }
     if (string.contains('transfer')) {
@@ -148,14 +175,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      print('tapped');
-                      RPBankAPI api = RPBankAPI();
-                      api.checkBalance(username: widget.username);
-                    },
-                    child: speakOutBalance(),
-                  ),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.grey.shade300,
@@ -174,14 +193,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     height: 200,
-                    width: 0.5.sw,
-                    child: const Center(
-                      child: Text(
-                        'Hello',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                        ),
+                    width: 1.sw,
+                    child: Center(
+                      child: ListView.builder(
+                        itemCount: history.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(history[index]['to-from']),
+                              subtitle:
+                                  Text(history[index]['amount'].toString()),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -199,36 +224,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void getTextfromAudio() {}
-
-  Container speakOutBalance() {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          border: Border.all(
-            color: Colors.grey,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 0), // changes position of shadow
-            ),
-          ]),
-      height: 200,
-      width: 0.5.sw,
-      child: const Center(
-        child: Text(
-          'Balance',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget homeScreenAppBar() {
     return Column(
@@ -267,17 +262,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     // icon: Icon(Icons.book)
                     itemBuilder: (context) {
                       return [
-                        const PopupMenuItem<int>(
+                        PopupMenuItem<int>(
+                          onTap: () async {
+                            RPBankAPI api = RPBankAPI();
+                            final user =
+                                await api.userDetails(user: widget.username);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileScreen(user: user),
+                              ),
+                            );
+                          },
                           value: 0,
-                          child: Text("My Account"),
+                          child: const Text("My Account"),
                         ),
-                        const PopupMenuItem<int>(
+                        PopupMenuItem<int>(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LanguageScreen(),
+                              ),
+                            );
+                          },
                           value: 1,
-                          child: Text("Settings"),
-                        ),
-                        const PopupMenuItem<int>(
-                          value: 2,
-                          child: Text("Logout"),
+                          child: const Text("Logout"),
                         ),
                       ];
                     },
@@ -446,15 +456,30 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               height: 0.03.sh,
             ),
-            _instructionItem(
-                '1. Tap the microphone button to start listening.'),
-            _instructionItem('2. Speak clearly and at a moderate pace.'),
-            _instructionItem('3. You can use the following commands:'),
-            _instructionItem('  - "Pause": Pause the speech.'),
-            _instructionItem('  - "Resume": Resume the speech.'),
-            _instructionItem('  - "Stop": Stop the speech.'),
-            _instructionItem(
-                '4. Tap the microphone button again to stop listening.'),
+            _instructionItem((isTelugu)
+                ? '1. వినడం ప్రారంభించడానికి మైక్రోఫోన్ బటన్‌ను నొక్కండి.'
+                : '1. Tap the microphone button to start listening.'),
+            _instructionItem((isTelugu)
+                ? '2. స్పష్టంగా మరియు మితమైన వేగంతో మాట్లాడండి.'
+                : '2. Speak clearly and at a moderate pace.'),
+            _instructionItem((isTelugu)
+                ? '3. మీరు కింది ఆదేశాలను ఉపయోగించవచ్చు:'
+                : '3. You can use the following commands:'),
+            _instructionItem((isTelugu)
+                ? '  - "బ్యాలెన్స్": ఖాతా బ్యాలెన్స్ తనిఖీ చేయండి.'
+                : '  - "Balance": Check account balance.'),
+            _instructionItem((isTelugu)
+                ? '  - "వివరాలు": వినియోగదారు వివరాలను వీక్షించండి'
+                : '  - "Details": View user details'),
+            _instructionItem((isTelugu)
+                ? '  - "చరిత్ర": గత 10 లావాదేవీలను చూడండి.'
+                : '  - "History": look at past 10 transactions.'),
+            _instructionItem((isTelugu)
+                ? '  - "బదిలీ": లావాదేవీ చేయండి.'
+                : '  - "Transfer": Make a transaction.'),
+            _instructionItem((isTelugu)
+                ? '4. వినడం ఆపడానికి మైక్రోఫోన్ బటన్‌ను మళ్లీ నొక్కండి.'
+                : '4. Tap the microphone button again to stop listening.'),
           ],
         ),
       ),

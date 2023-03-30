@@ -41,7 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image(
-                  image: AssetImage("assets/images/logo_illustration.png"),
+                  image:
+                      const AssetImage("assets/images/logo_illustration.png"),
                   height: 0.6.sw,
                   width: 0.6.sw,
                 ),
@@ -254,14 +255,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
+    bool output = false;
     setState(() {
       isLoading = true;
     });
     RPBankAPI api = RPBankAPI();
-    bool output = await api.login(
+    output = await api.login(
         pin: _pinController.text, username: _usernameController.text);
 
-    if (output) {
+    if (output == true) {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -271,6 +273,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
+      setState(() {
+        isLoading = false;
+      });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
