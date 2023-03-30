@@ -137,8 +137,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: speakOutBalance(),
               ),
-              Container(
-                decoration: BoxDecoration(
+              GestureDetector(
+                onTap: () async {
+                  print('tapped');
+                  RPBankAPI api = RPBankAPI();
+                  await api.userDetails(user: widget.username);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     border: Border.all(
                       color: Colors.grey,
@@ -152,15 +158,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         offset:
                             const Offset(0, 0), // changes position of shadow
                       ),
-                    ]),
-                height: 200,
-                width: 0.5.sw,
-                child: const Center(
-                  child: Text(
-                    'Hello',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
+                    ],
+                  ),
+                  height: 200,
+                  width: 0.5.sw,
+                  child: const Center(
+                    child: Text(
+                      'Hello',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),

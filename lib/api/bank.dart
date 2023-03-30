@@ -24,7 +24,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['_id'].toString(),
+      id: json['id'].toString(),
       nickName: json['nick_name'],
       fullName: json['full_name'],
       userName: json['user_name'],
@@ -129,6 +129,7 @@ class RPBankAPI {
   }
 
   Future<void> userDetails({required String user}) async {
+    JsonCodec codec = const JsonCodec();
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
     // to check balance
@@ -139,9 +140,17 @@ class RPBankAPI {
 
     var headers = {'Content-Type': 'application/json'};
 
-    Response response = await http.post(url, headers: headers, body: payload);
+    Response response = await http.post(url,
+        headers: headers, body: payload, encoding: Encoding.getByName("utf-8"));
     String responseBody = response.body;
+
+    // Manually decode the response
+    responseBody = responseBody.replaceAll("'", "\"");
+    String userId = responseBody.substring(18, 42);
+    responseBody = "{\"_id\": \"$userId\", ${responseBody.substring(46)}";
     print(responseBody);
+    User userNew = User.fromJson(jsonDecode(responseBody));
+    print(userNew);
   }
 
   Future<void> userRemove({required String user}) async {
