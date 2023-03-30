@@ -1,6 +1,39 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:voice_app/api/tts.dart';
+
+class User {
+  String id;
+  String nickName;
+  String fullName;
+  String userName;
+  String pinNumber;
+  String mobNumber;
+  String upiId;
+
+  User({
+    required this.id,
+    required this.nickName,
+    required this.fullName,
+    required this.userName,
+    required this.pinNumber,
+    required this.mobNumber,
+    required this.upiId,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'].toString(),
+      nickName: json['nick_name'],
+      fullName: json['full_name'],
+      userName: json['user_name'],
+      pinNumber: json['pin_number'],
+      mobNumber: json['mob_number'],
+      upiId: json['upi_id'],
+    );
+  }
+}
 
 class RPBankAPI {
   void register({
@@ -65,9 +98,8 @@ class RPBankAPI {
     tts(text: "${response.body}rupees only");
   }
 
-  Future<void> transferMoney({
-    required String username,
-    required String amount,
+  Future<bool> transferMoney({
+    required int amount,
     required String from,
     required String to,
   }) async {
@@ -80,14 +112,24 @@ class RPBankAPI {
       "from_user": from,
       "to_user": to
     });
+    print(payload);
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    print(response.body);
+    var response = await http.post(
+      url,
+      headers: headers,
+      body: payload,
+    );
+    if (response.body.contains("success")) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<void> userDetails({required String user}) async {
+    JsonCodec codec = const JsonCodec();
     var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
 
     // to check balance
@@ -98,11 +140,17 @@ class RPBankAPI {
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    var responseBody = response.body;
+    Response response = await http.post(url,
+        headers: headers, body: payload, encoding: Encoding.getByName("utf-8"));
+    String responseBody = response.body;
 
-    var text = json.decode(responseBody);
-    print(text);
+    // Manually decode the response
+    responseBody = responseBody.replaceAll("'", "\"");
+    String userId = responseBody.substring(18, 42);
+    responseBody = "{\"_id\": \"$userId\", ${responseBody.substring(46)}";
+    print(responseBody);
+    User userNew = User.fromJson(jsonDecode(responseBody));
+    print(userNew);
   }
 
   Future<void> userRemove({required String user}) async {

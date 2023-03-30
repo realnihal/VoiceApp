@@ -266,7 +266,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(username: _usernameController.text),
+          builder: (context) => HomeScreen(
+              username: _usernameController.text, pin: _pinController.text),
         ),
       );
     } else {

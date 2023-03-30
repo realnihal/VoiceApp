@@ -1,10 +1,15 @@
 import "dart:convert";
 
 import "package:http/http.dart" as http;
+import "package:shared_preferences/shared_preferences.dart";
 
 Future<String> asr({required String path}) async {
+  // get lang from prefs
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String lang = prefs.getString('language') ?? 'english';
+
   try {
-    var inputLanguage = 'english'; // input audio language
+    var inputLanguage = lang; // input audio language
     var inputAudioPath = path; // input audio path
     var url = Uri.parse('https://asr.iitm.ac.in/asr/v2/decode'); // endpoint
 

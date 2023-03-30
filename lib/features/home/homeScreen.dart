@@ -8,10 +8,12 @@ import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/api/tts.dart';
 import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
+import '../payment/Payment.dart';
 
 class HomeScreen extends StatefulWidget {
   String username;
-  HomeScreen({super.key, required this.username});
+  String pin;
+  HomeScreen({super.key, required this.username, required this.pin});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -64,12 +66,28 @@ class _HomeScreenState extends State<HomeScreen> {
     RPBankAPI api = RPBankAPI();
     if (string.contains('balance')) {
       await api.checkBalance(username: widget.username);
+      return;
     }
     if (string.contains('details')) {
       await api.userDetails(user: widget.username);
+      return;
     }
     if (string.contains('history')) {
       history = await api.userHistory(user: widget.username);
+      return;
+    }
+    if (string.contains('transfer')) {
+      await tts(text: "Please say out the reciever of the transfer");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return PaymentScreen(
+            username: widget.username,
+            pin: widget.pin,
+          );
+        }),
+      );
+      return;
     }
     if (string.contains('remove')) {
       await api.userRemove(user: widget.username);
@@ -77,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.pushReplacementNamed(context, "/");
     } else {
       tts(text: "Please try again");
+      return;
     }
   }
 
