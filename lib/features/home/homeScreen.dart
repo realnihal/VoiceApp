@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/api/tts.dart';
@@ -18,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
+  bool isRecording = false;
+  bool isLoading = false;
   final String _mPath = 'audio.mp4';
   String history = '';
   String output = "";
@@ -70,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (string.contains('remove')) {
       await api.userRemove(user: widget.username);
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, "/");
     } else {
       tts(text: "Please try again");
@@ -79,93 +83,91 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: homeScreenAppBar(),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 200,
-            width: 1.sw,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              // show current balance
-              children: [
-                Text(
-                  (recorder.isRecording) ? 'Speak out your query' : '',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  output,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
+      backgroundColor: Colors.white,
+      body: Container(
+        height: 1.sh,
+        width: 1.sw,
+        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: () {
-                  print('tapped');
-                  RPBankAPI api = RPBankAPI();
-                  api.checkBalance(username: widget.username);
-                },
-                child: speakOutBalance(),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 0), // changes position of shadow
+              homeScreenAppBar(),
+              SizedBox(
+                height: 0.2.sh,
+                width: 1.sw,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  // show current balance
+                  children: [
+                    Text(
+                      (recorder.isRecording) ? 'Speak out your query...' : '',
+                      style: GoogleFonts.poppins(
+                        fontSize: 0.05.sw,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
                       ),
-                    ]),
-                height: 200,
-                width: 0.5.sw,
-                child: const Center(
-                  child: Text(
-                    'Hello',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    Text(
+                      output,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      print('tapped');
+                      RPBankAPI api = RPBankAPI();
+                      api.checkBalance(username: widget.username);
+                    },
+                    child: speakOutBalance(),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                              const Offset(0, 0), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    height: 200,
+                    width: 0.5.sw,
+                    child: const Center(
+                      child: Text(
+                        'Hello',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 0.1.sh,
+              ),
+              micWidget(),
             ],
           ),
-          SizedBox(
-            height: 0.2.sh,
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (recorder.isRecording) {
-                await stop();
-              } else {
-                await record();
-              }
-              setState(() {});
-            },
-            child: Icon(
-              (recorder.isRecording) ? Icons.stop : Icons.mic,
-              size: 80,
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
@@ -202,58 +204,246 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  AppBar homeScreenAppBar() {
-    return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(2.0),
-            child: Image(
-              image: AssetImage("assets/images/logo.png"),
-              height: 30,
-              width: 30,
+  Widget homeScreenAppBar() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 1.sw,
+          height: 0.1.sh,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 0.06.sh,
+                margin: EdgeInsets.only(left: 0.05.sw),
+                child: Image.asset(
+                  "assets/images/logo_illustration.png",
+                ),
+              ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _showInstructionsModal(context);
+                    },
+                    child: Icon(
+                      Icons.help_outline_rounded,
+                      size: 0.03.sh,
+                    ),
+                  ),
+                  PopupMenuButton(
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Colors.black,
+                      size: 0.03.sh,
+                    ),
+                    // icon: Icon(Icons.book)
+                    itemBuilder: (context) {
+                      return [
+                        const PopupMenuItem<int>(
+                          value: 0,
+                          child: Text("My Account"),
+                        ),
+                        const PopupMenuItem<int>(
+                          value: 1,
+                          child: Text("Settings"),
+                        ),
+                        const PopupMenuItem<int>(
+                          value: 2,
+                          child: Text("Logout"),
+                        ),
+                      ];
+                    },
+                    onSelected: (value) {
+                      if (value == 0) {
+                        print("My account menu is selected.");
+                      } else if (value == 1) {
+                        print("Settings menu is selected.");
+                      } else if (value == 2) {
+                        print("Logout menu is selected.");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(
+            top: 0.01.sh,
+            left: 0.05.sw,
+          ),
+          child: Text(
+            "Welcome back!",
+            style: GoogleFonts.poppins(
+              fontSize: 0.06.sw,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const Text('EasyBank', style: TextStyle(color: Colors.black)),
-          PopupMenuButton(
-              icon: const Icon(
-                Icons.more_vert,
-                color: Colors.black,
-              ),
-              // icon: Icon(Icons.book)
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem<int>(
-                    value: 0,
-                    child: Text("My Account"),
-                  ),
-                  const PopupMenuItem<int>(
-                    value: 1,
-                    child: Text("Settings"),
-                  ),
-                  const PopupMenuItem<int>(
-                    value: 2,
-                    child: Text("Logout"),
-                  ),
-                ];
-              },
-              onSelected: (value) {
-                if (value == 0) {
-                  print("My account menu is selected.");
-                } else if (value == 1) {
-                  print("Settings menu is selected.");
-                } else if (value == 2) {
-                  print("Logout menu is selected.");
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()));
-                }
-              }),
+        ),
+      ],
+    );
+  }
+
+  Widget micWidget() {
+    return SizedBox(
+      width: 1.sw,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              if (recorder.isRecording) {
+                setState(() {
+                  isRecording = false;
+                  isLoading = true;
+                });
+                await stop();
+                setState(() {
+                  isLoading = false;
+                });
+              } else {
+                setState(() {
+                  isRecording = true;
+                });
+                await record();
+              }
+              setState(() {});
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                (isRecording)
+                    ? Image.asset(
+                        "assets/images/audio_bubble.gif",
+                        height: 0.25.sh,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 0.25.sh,
+                      ),
+                CircleAvatar(
+                  radius: 0.14.sw,
+                  backgroundColor: const Color(0xff1565C0),
+                  child: (isLoading)
+                      ? SizedBox(
+                          height: 0.05.sh,
+                          width: 0.05.sh,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : Icon(
+                          (isRecording) ? Icons.stop : Icons.mic,
+                          size: 0.1.sw,
+                          color: Colors.white,
+                        ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-      backgroundColor: Colors.white,
+    );
+  }
+
+  void _showInstructionsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(0.05.sw),
+        topRight: Radius.circular(0.05.sw),
+      )),
+      builder: (BuildContext context) {
+        return instructionBottomSheet();
+      },
+    );
+  }
+
+  Widget instructionBottomSheet() {
+    return Container(
+      height: 0.7.sh,
+      width: 1.sw,
+      margin: EdgeInsets.only(top: 0.03.sh, left: 0.05.sw, right: 0.05.sw),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 0.04.sw,
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        size: 0.05.sw,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 0.03.sw,
+                    ),
+                    Text(
+                      'Instructions',
+                      style: GoogleFonts.poppins(
+                        fontSize: 0.06.sw,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Icon(
+                    Icons.close,
+                    size: 0.03.sh,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 0.03.sh,
+            ),
+            _instructionItem(
+                '1. Tap the microphone button to start listening.'),
+            _instructionItem('2. Speak clearly and at a moderate pace.'),
+            _instructionItem('3. You can use the following commands:'),
+            _instructionItem('  - "Pause": Pause the speech.'),
+            _instructionItem('  - "Resume": Resume the speech.'),
+            _instructionItem('  - "Stop": Stop the speech.'),
+            _instructionItem(
+                '4. Tap the microphone button again to stop listening.'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _instructionItem(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 0.006.sh),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 0.04.sw,
+        ),
+      ),
     );
   }
 }

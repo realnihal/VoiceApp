@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class LanguageScreen extends StatelessWidget {
-  const LanguageScreen({super.key});
+class SetupScreen extends StatefulWidget {
+  const SetupScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void setprefs(String lang) async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('language', lang);
-    }
+  State<SetupScreen> createState() => _SetupScreenState();
+}
 
+class _SetupScreenState extends State<SetupScreen> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SizedBox(
+      body: Container(
         height: 1.sh,
         width: 1.sw,
         child: Column(
@@ -59,7 +60,7 @@ class LanguageScreen extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      setprefs('english');
+                      // setprefs('english');
                       Navigator.pushNamed(context, '/login');
                     },
                     behavior: HitTestBehavior.opaque,
@@ -117,7 +118,7 @@ class LanguageScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      setprefs('telugu');
+                      // setprefs('english');
                       Navigator.pushNamed(context, '/login');
                     },
                     behavior: HitTestBehavior.opaque,

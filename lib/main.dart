@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:voice_app/features/auth/register.dart';
+import 'package:voice_app/features/setupScreen.dart';
 
 import 'features/auth/languagueScreen.dart';
 import 'features/auth/loginScreen.dart';

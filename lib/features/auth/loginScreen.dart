@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/features/home/homeScreen.dart';
@@ -11,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool isLoading = false;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
 
@@ -23,103 +25,244 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Image(
-              image: AssetImage("assets/images/logo.png"),
-              height: 150,
-              width: 150,
-            ),
-            Text(
-              'EasyBank',
-              style: GoogleFonts.poppins(
-                color: Colors.black,
-                fontSize: 26,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            SizedBox(
-              width: 300,
-              child: TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  hintText: 'username',
-                  hintStyle: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Container(
+          width: 1.sw,
+          height: 1.sh,
+          margin: EdgeInsets.only(top: 0.15.sh),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage("assets/images/logo_illustration.png"),
+                  height: 0.6.sw,
+                  width: 0.6.sw,
                 ),
-              ),
-            ),
-            SizedBox(
-              width: 300,
-              child: TextField(
-                controller: _pinController,
-                decoration: InputDecoration(
-                  hintText: 'pin',
-                  hintStyle: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+                SizedBox(
+                  height: 0.05.sh,
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 300,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  login();
-                },
-                child: Text(
+                Text(
                   'Login',
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
+                    color: Colors.black,
+                    fontSize: 26,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            SizedBox(
-              width: 300,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/register');
-                },
-                child: Text(
-                  'Register',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+                Container(
+                  width: 1.sw,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8F4FD),
+                    borderRadius: BorderRadius.circular(
+                      0.02.sw,
+                    ),
+                    border: Border.all(
+                      color: const Color(0xffA9C9E8),
+                      width: 1,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(
+                    left: 0.0.sw,
+                  ),
+                  child: TextFormField(
+                    cursorColor: Colors.black87,
+                    controller: _usernameController,
+                    style: GoogleFonts.poppins(
+                      fontSize: 0.04.sw,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(
+                        Icons.person,
+                        color: Colors.black87,
+                      ),
+                      hintText: 'username',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 0.04.sw,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black87,
+                      ),
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+                Container(
+                  width: 1.sw,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8F4FD),
+                    borderRadius: BorderRadius.circular(
+                      0.02.sw,
+                    ),
+                    border: Border.all(
+                      color: const Color(0xffA9C9E8),
+                      width: 1,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(
+                    left: 0.0.sw,
+                  ),
+                  child: TextField(
+                    cursorColor: Colors.black87,
+                    style: GoogleFonts.poppins(
+                      fontSize: 0.04.sw,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                      decorationThickness: 0,
+                    ),
+                    controller: _pinController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(
+                        Icons.remove_red_eye_outlined,
+                        color: Colors.black87,
+                      ),
+                      hintText: 'pin',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 0.04.sw,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black87,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+                Container(
+                  width: 1.sw,
+                  height: 0.05.sh,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        await login();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff1565C0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          isLoading
+                              ? Row(
+                                  children: [
+                                    SizedBox(
+                                      height: 0.02.sh,
+                                      width: 0.02.sh,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 0.006.sw,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 0.03.sw,
+                                    ),
+                                  ],
+                                )
+                              : Container(),
+                          Text(
+                            'Login',
+                            style: GoogleFonts.poppins(
+                              fontSize: 0.042.sw,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )),
+                ),
+                Container(
+                  width: 1.sw,
+                  margin: EdgeInsets.symmetric(
+                    vertical: 0.02.sh,
+                    horizontal: 0.05.sw,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 0.001.sh,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 0.03.sw,
+                      ),
+                      Text(
+                        "Or",
+                        style: GoogleFonts.poppins(
+                          fontSize: 0.04.sw,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 0.03.sw,
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: 0.001.sh,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 1.sw,
+                  height: 0.05.sh,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/register');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff1565C0),
+                    ),
+                    child: Text(
+                      'Register',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  void login() async {
+  Future<void> login() async {
+    setState(() {
+      isLoading = true;
+    });
     RPBankAPI api = RPBankAPI();
     bool output = await api.login(
         pin: _pinController.text, username: _usernameController.text);
 
     if (output) {
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -127,6 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
