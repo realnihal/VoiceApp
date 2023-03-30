@@ -1,6 +1,39 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:voice_app/api/tts.dart';
+
+class User {
+  String id;
+  String nickName;
+  String fullName;
+  String userName;
+  String pinNumber;
+  String mobNumber;
+  String upiId;
+
+  User({
+    required this.id,
+    required this.nickName,
+    required this.fullName,
+    required this.userName,
+    required this.pinNumber,
+    required this.mobNumber,
+    required this.upiId,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['_id'].toString(),
+      nickName: json['nick_name'],
+      fullName: json['full_name'],
+      userName: json['user_name'],
+      pinNumber: json['pin_number'],
+      mobNumber: json['mob_number'],
+      upiId: json['upi_id'],
+    );
+  }
+}
 
 class RPBankAPI {
   void register({
@@ -106,9 +139,8 @@ class RPBankAPI {
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    var responseBody = response.body;
-
+    Response response = await http.post(url, headers: headers, body: payload);
+    String responseBody = response.body;
     print(responseBody);
   }
 
