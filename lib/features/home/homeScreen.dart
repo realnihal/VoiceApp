@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_app/api/bank.dart';
+import 'package:voice_app/api/tts.dart';
 import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
 
@@ -70,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (string.contains('remove')) {
       await api.userRemove(user: widget.username);
       Navigator.pushReplacementNamed(context, "/");
+    } else {
+      tts(text: "Please try again");
     }
   }
 

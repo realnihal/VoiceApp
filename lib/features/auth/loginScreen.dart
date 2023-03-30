@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: TextField(
                 controller: _pinController,
                 decoration: InputDecoration(
-                  hintText: 'pincode',
+                  hintText: 'pin',
                   hintStyle: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,

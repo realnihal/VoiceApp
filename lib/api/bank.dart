@@ -137,8 +137,7 @@ class RPBankAPI {
     var response = await http.post(url, headers: headers, body: payload);
     var responseBody = response.body;
 
-    var text = json.decode(responseBody);
-    print(text);
-    return text;
+    print(responseBody);
+    return responseBody;
   }
 }
