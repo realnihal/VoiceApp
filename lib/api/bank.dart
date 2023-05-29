@@ -52,7 +52,7 @@ class RPBankAPI {
     var payload = json.encode({
       "action": "register",
       "nick_name": username,
-      "token": token,
+      "api_token": token,
       "full_name": fullname,
       "user_name": username,
       "pin_number": pin,
@@ -69,6 +69,8 @@ class RPBankAPI {
 
     var response = await http.post(url, headers: headers, body: encrypteddata);
     print(response.body);
+    final output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
   }
 
   Future<bool> login({required String username, required String pin}) async {
