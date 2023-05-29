@@ -35,12 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
         body: Container(
           width: 1.sw,
           height: 1.sh,
-          margin: EdgeInsets.only(top: 0.15.sh),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 0.15.sh,
+                ),
                 Image(
                   image:
                       const AssetImage("assets/images/logo_illustration.png"),
