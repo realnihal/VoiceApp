@@ -10,7 +10,7 @@ Future<void> tts({required String text}) async {
   final prefs = await SharedPreferences.getInstance();
   final lan = prefs.getString('language') ?? "english";
   AudioPlayer player = AudioPlayer();
-  const gender = 'male';
+  const gender = 'female';
 
   if (lan == "telugu") {
     final translator = GoogleTranslator();

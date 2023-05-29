@@ -84,7 +84,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         tts(text: "You can't send more than 100 rupees at a time.");
         return;
       }
-      bank.userDetails(user: to);
+      // bank.userDetails(user: to);
       final bool outcome =
           await bank.transferMoney(amount: amt, from: from, to: to);
       if (outcome) {
@@ -170,8 +170,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 width: 0.8.sw,
                 child: ElevatedButton(
                   onPressed: () {
-                    checkAndVerifyTransaction(output, widget.username,
-                        _amountController.text, widget.pin);
+                    checkAndVerifyTransaction(_toController.text,
+                        widget.username, _amountController.text, widget.pin);
                   },
                   child: const Text('Submit'),
                 ),

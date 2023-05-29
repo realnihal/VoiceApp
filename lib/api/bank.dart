@@ -110,7 +110,7 @@ class RPBankAPI {
   }
 
   Future<void> checkBalance({required String username}) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:3000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
@@ -139,12 +139,13 @@ class RPBankAPI {
     required String from,
     required String to,
   }) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "transfer",
       "amount": amount,
+      "api_token": token,
       "from_user": from,
       "to_user": to
     });
@@ -152,12 +153,16 @@ class RPBankAPI {
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(
-      url,
-      headers: headers,
-      body: payload,
-    );
-    if (response.body.contains("success")) {
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
+
+    print(encrypteddata);
+
+    var response = await http.post(url, headers: headers, body: encrypteddata);
+    print(response.body);
+    final output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
+    if (output.contains("success")) {
       return true;
     } else {
       return false;
@@ -165,45 +170,66 @@ class RPBankAPI {
   }
 
   Future<User> userDetails({required String user}) async {
+    print(user);
     JsonCodec codec = const JsonCodec();
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "details",
+      "api_token": token,
       "nick_name": user,
     });
 
     var headers = {'Content-Type': 'application/json'};
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
 
-    Response response = await http.post(url,
-        headers: headers, body: payload, encoding: Encoding.getByName("utf-8"));
-    String responseBody = response.body;
+    print(encrypteddata);
 
-    // Manually decode the response
-    responseBody = responseBody.replaceAll("'", "\"");
-    String userId = responseBody.substring(18, 42);
-    responseBody = "{\"_id\": \"$userId\", ${responseBody.substring(46)}";
-    print(responseBody);
-    User userNew = User.fromJson(jsonDecode(responseBody));
+    var response = await http.post(url, headers: headers, body: encrypteddata);
+    print("OUTPUT");
+    print(response.body);
+    var output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print("OUTPUT");
+    print(output);
+
+    // // Manually decode the response
+    output = output.replaceAll("'", "\"");
+    String userId = output.substring(18, 42);
+    output = "{\"_id\": \"$userId\", ${output.substring(46)}";
+    print(output);
+    User userNew = User.fromJson(jsonDecode(output));
     print(userNew.fullName);
     return userNew;
   }
 
   Future<void> userRemove({required String user}) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "remove",
       "nick_name": user,
+      "api_token": token,
     });
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    String responseBody = response.body;
-    if (responseBody.contains("")) {
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
+
+    print(encrypteddata);
+
+    var response = await http.post(url,
+        headers: headers,
+        body: encrypteddata,
+        encoding: Encoding.getByName("utf-8"));
+    print(response.body);
+    var output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
+
+    if (output.contains("")) {
       tts(text: "User removed successfully");
     } else {
       tts(text: "User not found");
@@ -211,25 +237,36 @@ class RPBankAPI {
   }
 
   Future<List> userHistory({required String user}) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "history",
       "nick_name": user,
+      "api_token": token,
     });
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
-    var responseBody = response.body;
-    responseBody = responseBody.replaceAll("'", '"');
-    responseBody = responseBody.replaceAll("ObjectId(", "");
-    responseBody = responseBody.replaceAll(")", "");
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
 
-    List jsonparsed = json.decode(responseBody);
+    print(encrypteddata);
 
-    print(responseBody);
+    var response = await http.post(url,
+        headers: headers,
+        body: encrypteddata,
+        encoding: Encoding.getByName("utf-8"));
+    print(response.body);
+    var output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
+    output = output.replaceAll("'", '"');
+    output = output.replaceAll("ObjectId(", "");
+    output = output.replaceAll(")", "");
+
+    List jsonparsed = json.decode(output);
+
+    print(output);
     if (jsonparsed.length < 10) {
     } else {
       jsonparsed = jsonparsed.reversed.toList().sublist(0, 10);
