@@ -65,6 +65,8 @@ class RPBankAPI {
     BankEncryption bankEncryption = BankEncryption();
     final encrypteddata = await bankEncryption.encrypt(payload);
 
+    print(encrypteddata);
+
     var response = await http.post(url, headers: headers, body: encrypteddata);
     print(response.body);
   }
