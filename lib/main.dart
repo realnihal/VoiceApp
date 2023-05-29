@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:voice_app/features/auth/register.dart';
+import 'package:voice_app/features/home/dummy.dart';
 
 import 'features/auth/languagueScreen.dart';
 import 'features/auth/loginScreen.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterPage(),
-            '/': (context) => const LanguageScreen(),
+            '/': (context) => DummyScreen(),
           },
         );
       },
