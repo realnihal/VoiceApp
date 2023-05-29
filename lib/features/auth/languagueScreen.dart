@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voice_app/features/auth/loginScreen.dart';
 
 class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
@@ -60,7 +61,12 @@ class LanguageScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       setprefs('english');
-                      Navigator.pushNamed(context, '/login');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Container(
@@ -118,7 +124,12 @@ class LanguageScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       setprefs('telugu');
-                      Navigator.pushNamed(context, '/login');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Container(
