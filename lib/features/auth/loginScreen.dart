@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:voice_app/api/bank.dart';
+import 'package:voice_app/features/auth/register.dart';
 import 'package:voice_app/features/home/homeScreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -121,6 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: TextField(
                     cursorColor: Colors.black87,
+                    keyboardType: TextInputType.number,
                     style: GoogleFonts.poppins(
                       fontSize: 0.04.sw,
                       fontWeight: FontWeight.w400,
@@ -130,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _pinController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
-                        Icons.remove_red_eye_outlined,
+                        Icons.remove_red_eye,
                         color: Colors.black87,
                       ),
                       hintText: 'pin',
@@ -229,7 +231,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/register');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff1565C0),
@@ -244,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 0.03.sh,
+                  height: 0.3.sh,
                 ),
               ],
             ),
@@ -255,32 +262,46 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    bool output = false;
-    setState(() {
-      isLoading = true;
-    });
-    RPBankAPI api = RPBankAPI();
-    output = await api.login(
-        pin: _pinController.text, username: _usernameController.text);
-
-    if (output == true) {
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(
-              username: _usernameController.text, pin: _pinController.text),
-        ),
-      );
-    } else {
+    if (_usernameController.text.isNotEmpty && _pinController.text.isNotEmpty) {
+      bool output = false;
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
-      if (!mounted) return;
+      RPBankAPI api = RPBankAPI();
+      output = await api.login(
+          pin: _pinController.text, username: _usernameController.text);
+
+      if (output == true) {
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+                username: _usernameController.text, pin: _pinController.text),
+          ),
+        );
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Invalid username or pin',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Invalid username or pin',
+            'Enter required fields',
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w400,
