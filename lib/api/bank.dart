@@ -109,18 +109,21 @@ class RPBankAPI {
     // to check balance
     var payload = json.encode({
       "action": "balance",
-      "token": token,
+      "api_token": token,
       "nick_name": username,
     });
 
     BankEncryption bankEncryption = BankEncryption();
-    final dataencrypted = bankEncryption.encrypt(payload);
+    final encrypteddata = await bankEncryption.encrypt(payload);
 
+    print(encrypteddata);
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: dataencrypted);
+    var response = await http.post(url, headers: headers, body: encrypteddata);
     print(response.body);
-    // tts(text: "${response.body}rupees only");
+    final output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
+    tts(text: "${output}rupees only");
   }
 
   Future<bool> transferMoney({
