@@ -124,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: TextField(
                     cursorColor: Colors.black87,
+                    obscureText: true,
                     keyboardType: TextInputType.number,
                     style: GoogleFonts.poppins(
                       fontSize: 0.04.sw,
