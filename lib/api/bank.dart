@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:encrypt/encrypt.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:voice_app/api/encryption.dart';
 import 'package:voice_app/api/tts.dart';
 
 class User {
@@ -36,18 +38,21 @@ class User {
 }
 
 class RPBankAPI {
+  final token = "rp-1zlhyiu6gkwi2oa";
+
   Future<void> register({
     required String fullname,
     required String username,
     required String mobile,
     required String pin,
   }) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "register",
       "nick_name": username,
+      "token": token,
       "full_name": fullname,
       "user_name": username,
       "pin_number": pin,
@@ -57,7 +62,12 @@ class RPBankAPI {
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
+
+    print(encrypteddata);
+
+    var response = await http.post(url, headers: headers, body: encrypteddata);
     print(response.body);
   }
 
@@ -83,19 +93,23 @@ class RPBankAPI {
   }
 
   Future<void> checkBalance({required String username}) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('http://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "balance",
+      "token": token,
       "nick_name": username,
     });
 
+    BankEncryption bankEncryption = BankEncryption();
+    final dataencrypted = bankEncryption.encrypt(payload);
+
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
+    var response = await http.post(url, headers: headers, body: dataencrypted);
     print(response.body);
-    tts(text: "${response.body}rupees only");
+    // tts(text: "${response.body}rupees only");
   }
 
   Future<bool> transferMoney({
