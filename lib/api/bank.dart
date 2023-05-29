@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -115,15 +116,17 @@ class RPBankAPI {
 
     BankEncryption bankEncryption = BankEncryption();
     final encrypteddata = await bankEncryption.encrypt(payload);
-
-    print(encrypteddata);
     var headers = {'Content-Type': 'application/json'};
-
-    var response = await http.post(url, headers: headers, body: encrypteddata);
-    print(response.body);
-    final output = await bankEncryption.decrypt(response.body.split("'")[1]);
-    print(output);
-    tts(text: "${output}rupees only");
+    try {
+      var response =
+          await http.post(url, headers: headers, body: encrypteddata);
+      print(response.body);
+      final output = await bankEncryption.decrypt(response.body.split("'")[1]);
+      print(output);
+      tts(text: "${output}rupees only");
+    } on SocketException catch (err) {
+      print(err);
+    }
   }
 
   Future<bool> transferMoney({
