@@ -74,20 +74,29 @@ class RPBankAPI {
   }
 
   Future<bool> login({required String username, required String pin}) async {
-    var url = Uri.parse('http://events.respark.iitm.ac.in:5000/rp_bank_api');
+    var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
     var payload = json.encode({
       "action": "details",
+      "api_token": token,
       "nick_name": username,
     });
 
     var headers = {'Content-Type': 'application/json'};
 
-    var response = await http.post(url, headers: headers, body: payload);
+    BankEncryption bankEncryption = BankEncryption();
+    final encrypteddata = await bankEncryption.encrypt(payload);
+
+    print(encrypteddata);
+
+    var response = await http.post(url, headers: headers, body: encrypteddata);
+    print(response.body);
+    final output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print(output);
 
     // check if pin is in response
-    if (response.body.contains(pin)) {
+    if (output.contains(pin)) {
       return true;
     } else {
       return false;
