@@ -236,7 +236,8 @@ class RPBankAPI {
     }
   }
 
-  Future<List> userHistory({required String user}) async {
+  Future<List> userHistory(
+      {required String user, required String toUser}) async {
     var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
@@ -244,6 +245,8 @@ class RPBankAPI {
       "action": "history",
       "nick_name": user,
       "api_token": token,
+      "date_filter": "2023-04-21:11-00,2023-05-24:15-00",
+      "user_filter": toUser,
     });
 
     var headers = {'Content-Type': 'application/json'};
@@ -253,12 +256,15 @@ class RPBankAPI {
 
     print(encrypteddata);
 
-    var response = await http.post(url,
-        headers: headers,
-        body: encrypteddata,
-        encoding: Encoding.getByName("utf-8"));
+    var response = await http.post(
+      url,
+      headers: headers,
+      body: encrypteddata,
+      encoding: Encoding.getByName("utf-8"),
+    );
     print(response.body);
     var output = await bankEncryption.decrypt(response.body.split("'")[1]);
+    print("OUTPUT");
     print(output);
     output = output.replaceAll("'", '"');
     output = output.replaceAll("ObjectId(", "");

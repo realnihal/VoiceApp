@@ -101,11 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (string.contains('history')) {
-      await tts(text: "Please say out the start date for query");
+      await tts(text: "Please say out the recipient name for query");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return const HistoryScreen();
+          return HistoryScreen(
+            user: widget.username,
+          );
         }),
       );
       return;
