@@ -11,6 +11,7 @@ import 'package:translator/translator.dart';
 import 'package:voice_app/api/bank.dart';
 import 'package:voice_app/api/tts.dart';
 import 'package:voice_app/features/auth/languagueScreen.dart';
+import 'package:voice_app/features/history.dart';
 import 'package:voice_app/features/home/profileScreen.dart';
 import '../../api/asr.dart';
 import '../auth/loginScreen.dart';
@@ -98,16 +99,15 @@ class _HomeScreenState extends State<HomeScreen> {
       }));
       return;
     }
-    if (string.contains('history')) {
-      history = await api.userHistory(user: widget.username);
-      setState(() {});
 
-      for (int i = 0; i < history.length; i++) {
-        print(history[i]);
-        await tts(
-            text:
-                "Transaction ${i + 1} ${history[i]['amount']} rupees from ${history[i]['from_user']} to ${history[i]['to_user']}");
-      }
+    if (string.contains('history')) {
+      await tts(text: "Please say out the start date for query");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return const HistoryScreen();
+        }),
+      );
       return;
     }
     if (string.contains('transfer')) {
