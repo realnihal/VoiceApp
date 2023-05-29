@@ -237,7 +237,9 @@ class RPBankAPI {
   }
 
   Future<List> userHistory(
-      {required String user, required String toUser}) async {
+      {required String user,
+      required String toUser,
+      required String dateFilter}) async {
     var url = Uri.parse('https://events.respark.iitm.ac.in:3000/rp_bank_api');
 
     // to check balance
@@ -245,7 +247,7 @@ class RPBankAPI {
       "action": "history",
       "nick_name": user,
       "api_token": token,
-      "date_filter": "2023-04-21:11-00,2023-05-24:15-00",
+      "date_filter": dateFilter,
       "user_filter": toUser,
     });
 

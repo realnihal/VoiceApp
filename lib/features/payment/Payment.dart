@@ -26,6 +26,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final String _mPath = 'audio.mp4';
   File audiofile = File('audio.mp4');
   String output = "";
+  bool isLoading = false;
+  bool isRecording = false;
+  bool buttonReload = false;
 
   void initRecorder() async {
     final status = await Permission.microphone.request();
@@ -77,6 +80,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   checkAndVerifyTransaction(
       String to, String from, String amount, String pin) async {
+    setState(() {
+      buttonReload = true;
+    });
     RPBankAPI bank = RPBankAPI();
     try {
       final int amt = int.parse(amount);
@@ -108,77 +114,276 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Payment'),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  (output == "") ? "Press the button to start recording" : "",
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(
+                context,
+              );
+            },
+            child: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.black,
+            ),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+        ),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 0.1.sw,
+                    top: 0.05.sh,
+                  ),
+                  width: 1.sw,
+                  child: Text(
+                    'Payment',
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.poppins(
+                      color: Colors.black,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 0.8.sw,
-                child: TextField(
-                  controller: _toController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter the recipient',
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 0.1.sw,
+                    bottom: 0.03.sh,
+                  ),
+                  width: 1.sw,
+                  child: Text(
+                    "Press the button to start recording",
+                    style: GoogleFonts.poppins(
+                      fontSize: 0.04.sw,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 0.8.sw,
-                child: TextField(
-                  controller: _amountController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter the amount',
+                Container(
+                  width: 1.sw,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8F4FD),
+                    borderRadius: BorderRadius.circular(
+                      0.02.sw,
+                    ),
+                    border: Border.all(
+                      color: const Color(0xffA9C9E8),
+                      width: 1,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(
+                    left: 0.03.sw,
+                  ),
+                  child: TextFormField(
+                    cursorColor: Colors.black87,
+                    keyboardType: TextInputType.name,
+                    controller: _toController,
+                    style: GoogleFonts.poppins(
+                      fontSize: 0.04.sw,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Enter recipent name',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 0.04.sw,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black87,
+                      ),
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (recorder.isRecording) {
-                    await stop();
-                  } else {
-                    await record();
-                  }
-                  setState(() {});
-                },
-                child: Icon(
-                  (recorder.isRecording) ? Icons.stop : Icons.mic,
-                  size: 80,
+                SizedBox(
+                  height: 0.03.sh,
                 ),
-              ),
-              const SizedBox(height: 100),
-              // confirm button
-              SizedBox(
-                width: 0.8.sw,
-                child: ElevatedButton(
-                  onPressed: () {
-                    checkAndVerifyTransaction(_toController.text,
-                        widget.username, _amountController.text, widget.pin);
-                  },
-                  child: const Text('Submit'),
+                Container(
+                  width: 1.sw,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8F4FD),
+                    borderRadius: BorderRadius.circular(
+                      0.02.sw,
+                    ),
+                    border: Border.all(
+                      color: const Color(0xffA9C9E8),
+                      width: 1,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(
+                    left: 0.03.sw,
+                  ),
+                  child: TextFormField(
+                    cursorColor: Colors.black87,
+                    keyboardType: TextInputType.number,
+                    controller: _amountController,
+                    style: GoogleFonts.poppins(
+                      fontSize: 0.04.sw,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Enter the amount',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 0.04.sw,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black87,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
-              )
-            ],
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+                Container(
+                  width: 1.sw,
+                  height: 0.05.sh,
+                  margin: EdgeInsets.symmetric(horizontal: 0.1.sw),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_toController.text.isNotEmpty &&
+                          _amountController.text.isNotEmpty) {
+                        checkAndVerifyTransaction(
+                            _toController.text,
+                            widget.username,
+                            _amountController.text,
+                            widget.pin);
+                      } else {
+                        tts(text: "Enter required fields");
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Enter required fields',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff1565C0),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        buttonReload
+                            ? Row(
+                                children: [
+                                  SizedBox(
+                                    height: 0.02.sh,
+                                    width: 0.02.sh,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 0.006.sw,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 0.03.sw,
+                                  ),
+                                ],
+                              )
+                            : Container(),
+                        Text(
+                          'Make Payment',
+                          style: GoogleFonts.poppins(
+                            fontSize: 0.042.sw,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 0.2.sh,
+                ),
+                micWidget(),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget micWidget() {
+    return SizedBox(
+      width: 1.sw,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              if (recorder.isRecording) {
+                setState(() {
+                  isRecording = false;
+                  isLoading = true;
+                });
+                await stop();
+                setState(() {
+                  isLoading = false;
+                });
+              } else {
+                setState(() {
+                  isRecording = true;
+                });
+                await record();
+              }
+              setState(() {});
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                (isRecording)
+                    ? Image.asset(
+                        "assets/images/audio_bubble.gif",
+                        height: 0.25.sh,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 0.25.sh,
+                      ),
+                CircleAvatar(
+                  radius: 0.14.sw,
+                  backgroundColor: const Color(0xff1565C0),
+                  child: (isLoading)
+                      ? SizedBox(
+                          height: 0.05.sh,
+                          width: 0.05.sh,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : Icon(
+                          (isRecording) ? Icons.stop : Icons.mic,
+                          size: 0.1.sw,
+                          color: Colors.white,
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
