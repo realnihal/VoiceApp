@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:voice_app/api/bank.dart';
+import 'package:voice_app/api/tts.dart';
 import 'package:voice_app/features/home/homeScreen.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -50,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
-        body: Container(
+        body: SizedBox(
           height: 1.sh,
           width: 1.sw,
           child: SingleChildScrollView(
@@ -333,6 +334,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             );
                           } else {
                             if (!mounted) return;
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -344,6 +346,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                             );
+                            tts(text: "Registration failed");
                             setState(() {
                               isLoading = false;
                             });
@@ -360,6 +363,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                           );
+                          tts(text: "Pin and confirm pin should match");
                         }
                       } else {
                         if (!mounted) return;
@@ -374,6 +378,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         );
+                        tts(text: "Enter required fields");
                       }
                     },
                     style: ElevatedButton.styleFrom(

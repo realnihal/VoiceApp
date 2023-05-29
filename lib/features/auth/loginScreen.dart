@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:voice_app/api/bank.dart';
+import 'package:voice_app/api/tts.dart';
 import 'package:voice_app/features/auth/register.dart';
 import 'package:voice_app/features/home/homeScreen.dart';
 
@@ -32,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Container(
+        body: SizedBox(
           width: 1.sw,
           height: 1.sh,
           child: SingleChildScrollView(
@@ -299,6 +300,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         );
+        tts(text: "Invalid username or pin");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -312,6 +314,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       );
+      tts(text: "Enter required fields");
     }
   }
 }
