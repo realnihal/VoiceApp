@@ -226,6 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   child: TextFormField(
                     cursorColor: Colors.black87,
+                    obscureText: true,
                     keyboardType: TextInputType.number,
                     controller: _pinController,
                     style: GoogleFonts.poppins(
@@ -313,22 +314,40 @@ class _RegisterPageState extends State<RegisterPage> {
                             isLoading = true;
                           });
                           RPBankAPI api = RPBankAPI();
-                          await api.register(
+                          bool result = await api.register(
                             mobile: _mobileController.text,
                             pin: _pinController.text,
                             fullname: _fullnameController.text,
                             username: _usernameController.text,
                           );
-                          if (!mounted) return;
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(
-                                username: _usernameController.text,
-                                pin: _pinController.text,
+                          if (result) {
+                            if (!mounted) return;
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(
+                                  username: _usernameController.text,
+                                  pin: _pinController.text,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Registration failed',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            );
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

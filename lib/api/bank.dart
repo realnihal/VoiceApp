@@ -41,7 +41,7 @@ class User {
 class RPBankAPI {
   final token = "rp-1zlhyiu6gkwi2oa";
 
-  Future<void> register({
+  Future<bool> register({
     required String fullname,
     required String username,
     required String mobile,
@@ -72,6 +72,11 @@ class RPBankAPI {
     print(response.body);
     final output = await bankEncryption.decrypt(response.body.split("'")[1]);
     print(output);
+    if (output.contains("success")) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<bool> login({required String username, required String pin}) async {
