@@ -246,7 +246,7 @@ class RPBankAPI {
       "nick_name": user,
       "api_token": token,
       "date_filter": "2023-04-21:11-00,2023-05-24:15-00",
-      "user_filter": toUser,
+      // "user_filter": toUser,
     });
 
     var headers = {'Content-Type': 'application/json'};

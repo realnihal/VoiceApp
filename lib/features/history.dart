@@ -85,7 +85,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ListView.builder(
             itemCount: userHistory.length,
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Container(
                 width: 1.sw,
